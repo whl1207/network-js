@@ -1,0 +1,338 @@
+<!doctype html>
+<html>
+	<head>
+		<title>复杂网络测试</title>
+		<meta charset="UTF-8">	
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style type="text/css">
+			.contentwrap {
+				width: 100%;
+				margin: 0 auto;
+				background-color: #ffffff;
+			}
+			ul {
+				list-style: none;
+				margin: 0;
+				padding-left: 0px;
+			}
+			ul.tab {
+				border-bottom: 1px solid #ccc;
+				padding-bottom:1px;
+				height: 30px;
+				line-height: 30px;
+				color: #696969;
+			}
+			ul.tab li {
+				float: left;
+				font-family: "微软雅黑";
+				cursor: pointer;
+				padding: 0px;
+			}
+			ul.tab li.li {
+				padding: 0px 25px 0px;
+				font-size: 13px;
+				height: 30px;
+				line-height: 30px;
+				background:#F4F5F9;
+				border-top: 1px solid #C5D0DC;
+				border-left: 1px solid #C5D0DC;
+				border-bottom: 1px solid #C5D0DC;
+				
+			}
+			ul.tab li.current {
+				border-bottom: 0px;
+				border-top: 2px solid #7599DE;
+				font-size: 13px;
+				color: #343434;
+				background:#FFFFFF;
+			}
+			ul.tab li.li:last-child{border-right: 1px solid #C5D0DC;}
+			.panel {
+				background: #ffffff;
+				padding: 10px;
+				margin-bottom: 3px;
+				float: left;
+				width:780px;
+			}
+			input {
+				padding:3px;  
+				background-color: #ffffff;
+				color: #000000; 
+				text-align: center;  
+				vertical-align: middle;  
+				border: 1px solid #000000;
+				font-size:90%;
+				width:30px
+			}
+			button {
+				padding:3px;  
+				background-color: #0057a8;
+				color: #ffffff; 
+				text-align: center;  
+				vertical-align: middle;  
+				border: 1px solid transparent;
+				font-size:90%  
+			}
+			select {
+				padding:3px;  
+				background-color: #007566;
+				color: #ffffff; 
+				text-align: center;  
+				vertical-align: middle;  
+				border: 1px solid transparent;
+				font-size:90%  
+			}
+			h1{
+				font-size: 20px;
+				height: 25px;
+				margin-top:0px;
+				margin-bottom: 5px;
+			}
+			textarea{
+				width:760px;
+				height:75px;
+			}
+		</style>
+	</head>
+	<body style="background-color: black;">
+		<div style="width:800px;margin:0 auto;padding-top: 10px;">
+			<canvas height="600px" width="800px" id="canvas">你的浏览器不支持canvas</canvas>
+			<div id="contentwrap"  class="contentwrap">
+				<ul class="tab">
+					<li id="tab0" class="li current" onclick="Tab(0)"><span>创建</span></li>
+					<li id="tab1" class="li" onclick="Tab(1)"><span>样式</span></li>
+					<li id="tab2" class="li" onclick="Tab(2)"><span>布局</span></li>
+					<li id="tab3" class="li" onclick="Tab(3);document.querySelector('#node').innerHTML=f.node.length;document.querySelector('#edge').innerHTML=f.edge.length"><span>统计</span></li>
+					<li id="tab4" class="li" onclick="Tab(4);document.querySelector('#effect').innerHTML=f.geteffect();document.querySelector('#Clustering').innerHTML=f.getAvgClustering()"><span>连通性分析</span></li>
+					<li id="tab5" class="li" onclick="Tab(5)"><span>抗毁性分析</span></li>
+					<li id="tab6" class="li" onclick="Tab(6);document.querySelector('#nodecode').innerHTML=JSON.stringify(f.node);document.querySelector('#edgecode').innerHTML=JSON.stringify(f.edge)"><span>数据</span></li>
+				</ul>
+			</div>
+			<div id="panel0" style="display: block;">
+				<div class="panel">
+					<h1>手动创建：</h1>
+					<span>节点名称：</span><input id="nodename" style="width:60px"></input>
+					<span>节点颜色：</span><input id="nodecolor" style="width:60px" value="#aaaaaa"></input>
+					<button onclick="f.addnode(document.querySelector('#nodename').value,document.querySelector('#nodecolor').value);add();f.graph();">添加点</button>
+					<hr />
+					<span>起点：</span>
+					<select id="a">
+						<option value="0">0</option>
+						<option value="1">1</option>
+					</select>
+					<span>终点：</span>
+					<select id="b">
+						<option value="0">0</option>
+						<option value="1" selected>1</option>
+					</select>
+					<button onclick="f.addedge(Number(document.querySelector('#a').value),Number(document.querySelector('#b').value));f.graph();">添加边</button>
+				</div>
+				<div class="panel">
+					<h1>自动创建：</h1>
+					<span>点数(n)：</span><input id="n" value="20"></input>
+					<span>边数(e)：</span><input id="e" value="20"></input>
+					<span>邻居(k)：</span><input id="k" value="2"></input>
+					<span>连接概率(p)：</span><input id="p" value="0.1"></input>
+					<hr />
+					<button onclick="f.createRandom(Number(document.querySelector('#n').value),0);add()">无边图</button>
+					<button onclick="f.createRandom(Number(document.querySelector('#n').value),Number(document.querySelector('#e').value));add()">随机网络G(n,e)</button>
+					<button onclick="f.createTree(Number(document.querySelector('#n').value));add()">树G(n)</button>
+					<button onclick="f.createER(Number(document.querySelector('#n').value),Number(document.querySelector('#p').value));add()">ER随机网络G(n,p)</button>
+					<button onclick="f.createSF(Number(document.querySelector('#n').value));add()">无标度网络G(n)</button>
+					<button onclick="f.createLOH(Number(document.querySelector('#n').value),Number(document.querySelector('#k').value));add()">最近邻耦合网络G(n,k)</button>
+					<button onclick="f.createWS(Number(document.querySelector('#n').value),Number(document.querySelector('#k').value),Number(document.querySelector('#p').value));add()">小世界网络G(n,k,p)</button>
+					<hr />
+					<span>初始布局：</span>
+					<select id="click" onchange="f.initgraphtype=this.value">
+						<option value="随机" selected>随机</option>
+						<option value="圆环">圆环</option>
+					</select>
+					<button onclick="f.initgraphtype='圆环';f.initgraph(true)">初始化为圆环</button>
+					<button onclick="f.initgraphtype='随机';f.initgraph(true)">初始化为随机</button>
+					<button onclick="f.graph()">重绘</button>
+				</div>
+			</div>
+			<div id="panel1" style="display: none;" class="panel">
+				<span>背景颜色：</span>
+				<input style="width:60px" value="#101010" onchange="f.bgcolor=this.value;f.graph();"></input>
+				<hr />
+				<span>节点名称：</span>
+				<select id="click" onchange="f.nodenamedisplay=eval(this.value.toLowerCase());f.graph();">
+					<option value="true" selected>显示</option>
+					<option value="false">不显示</option>
+				</select>
+				<span>节点大小：</span>
+				<input value="7" onchange="f.nodesize=Number(this.value);f.graph();"></input>
+				<hr />
+				<span>边颜色：</span><input style="width:60px" value="#101010" onchange="f.edgecolor=this.value;f.graph();"></input>
+				<span>边宽度：</span><input value="1" onchange="f.edgesize=Number(this.value);f.graph();"></input>
+			</div>
+			<div id="panel2" style="display: none;" class="panel">
+				<span>布局算法：</span>
+				<select id="l">
+					<option value="fr" selected>力导向图</option>
+				</select>
+				<button onclick="f.startlayer()">加速演化</button>
+				<button onclick="for (let i = 1; i <= f.timer; i++) {clearInterval(i);}">暂停</button>
+				<hr />
+				<span>力导向图参数：</span>
+				<span>拉力：</span><input type="range" min="2000" max="100000" style="width:100px" onchange="f.bf=this.value"></input>
+				<span>斥力：</span><input type="range" min="5" max="100" style="width:100px" onchange="f.af=this.value"></input>
+				<span>中心：</span><input type="range" min="0.001" max="0.2" step="0.001" style="width:100px" onchange="f.cf=this.value"></input>
+				<span>阻力：</span><input type="range" min="1" max="1.2" step="0.01" style="width:100px"onchange="f.zx=this.value"></input>
+			</div>
+			<div id="panel3" style="display: none;">
+				<div class="panel">
+					<span>点数：</span><span id="node"></span>
+					<span>；边数：</span><span id="edge"></span>
+					<button onclick="f.clearlabel();f.graph();">清空标签</button>
+					<hr />
+					<span>计算：</span>
+					<button onclick="f.showdegree();f.graph();">度</button>
+					<button onclick="f.showClustering()">聚集系数</button>
+					<button onclick="f.showbetweenness()">介数</button>
+					<hr />
+					<span>点击节点时：</span>
+					<select id="click" onchange="f.cmodel=this.value">
+						<option value="无行为" selected>无行为</option>
+						<option value="显示距离">标签显示距离</option>
+						<option value="距离上色">节点根据距离上色</option>
+					</select>
+					<hr />
+					<button onclick="document.querySelector('#DD').innerHTML=f.DegreeDistribution()">统计度分布</button>
+					<span id="DD">未统计</span>
+				</div>
+			</div>
+			<div id="panel4" style="display: none;">
+				<div class="panel">
+					<span>起点：</span>
+					<select id="la">
+						<option value="0">0</option>
+						<option value="1">1</option>
+					</select>
+					<span>终点：</span>
+					<select id="lb">
+						<option value="0">0</option>
+						<option value="1" selected>1</option>
+					</select>
+					<button onclick="f.showSPath(Number(document.querySelector('#la').value),Number(document.querySelector('#lb').value));document.querySelector('#S').innerHTML=f.getSPath(Number(document.querySelector('#la').value),Number(document.querySelector('#lb').value));f.graph()">寻找最短路</button>
+					<span id="S">未计算</span>
+					<hr />
+					<span>网络效率：</span><span id="effect"></span>
+					<hr />
+					<span>平均聚集系数：</span><span id="Clustering"></span>
+				</div>
+			</div>
+			<div id="panel5" style="display: none;">
+				<div class="panel">
+					<span>毁伤点数：</span><input value="1"></input>
+					<span>毁伤边数：</span><input value="1"></input>
+					<span>策略：</span>
+					<select>
+						<option value="随机毁伤" selected>随机毁伤</option>
+						<option value="介数毁伤">介数毁伤</option>
+					</select>
+					<button onclick="">开始毁伤分析</button>
+				</div>
+			</div>
+			<div id="panel6" style="display: none;">
+				<div class="panel">
+					<h1>节点：</h1><textarea id="nodecode"></textarea>
+					<h1>边：</h1><textarea id="edgecode"></textarea>
+					<button onclick="f.node=JSON.parse(document.querySelector('#nodecode').value);f.edge=JSON.parse(document.querySelector('#edgecode').value);f.graph()">恢复</button>
+				</div>
+			</div>
+		</div>
+		
+		<script src="main.js"></script><!--引入包-->
+		<script>
+			function Tab(id) {
+				let tabs=document.getElementsByClassName("li");
+				for(var i=0;i<tabs.length;i++){
+					tabs[i].className="li";
+					document.getElementById("panel"+i).style.display="none";
+				}
+				document.getElementById("tab"+id).className="li current";
+				document.getElementById("panel"+id).style.display="block";
+		   	}
+		</script>
+		<script>
+			let f=new network(document.getElementById("canvas"));
+			/* const node=[
+				{id:0,name:"0"},
+				{id:1,name:"1"},
+				{id:2,name:"2"},
+				{id:3,name:"3"},
+				{id:4,name:"4"},
+				{id:5,name:"5"},
+				{id:6,name:"6"},
+				{id:7,name:"7"},
+				{id:8,name:"8"},
+				{id:9,name:"9"},
+			];
+			const edge=[
+				{a: 9, b: 3},
+				{a: 5, b: 1},
+				{a: 8, b: 8},
+				{a: 9, b: 8},
+				{a: 5, b: 2},
+				{a: 9, b: 3},
+				{a: 1, b: 3},
+				{a: 3, b: 5},
+				{a: 2, b: 5},
+				{a: 2, b: 7},
+				{a: 1, b: 0},
+				{a: 0, b: 9},
+				{a: 0, b: 2},
+				{a: 8, b: 0},
+				{a: 7, b: 7},
+			] */
+			//按参数生成网络
+			//f.create(node,edge);
+			//生成树
+			//f.tree(100);
+			//生成随机网络
+			//f.random(100,60);
+
+			//生成连通子图列表
+			//console.log(f.check());
+
+			//生成路径列表
+			//console.log(f.getNodePathList(0));
+			//获得最短路径
+			//console.log(f.getSPath(0,1))
+
+			//
+			function add(){
+				document.querySelector('#a').innerHTML="";
+				document.querySelector('#b').innerHTML="";
+				for(var i=0;i<f.node.length;i++){
+					var option=document.createElement("option");
+					option.value=i;
+					option.innerHTML=f.node[i].name;
+					document.querySelector('#a').appendChild(option);
+				}
+				for(var i=0;i<f.node.length;i++){
+					var option=document.createElement("option");
+					option.value=i;
+					option.innerHTML=f.node[i].name;
+					document.querySelector('#b').appendChild(option);
+				}
+				document.querySelector('#la').innerHTML="";
+				document.querySelector('#lb').innerHTML="";
+				for(var i=0;i<f.node.length;i++){
+					var option=document.createElement("option");
+					option.value=i;
+					option.innerHTML=f.node[i].name;
+					document.querySelector('#la').appendChild(option);
+				}
+				for(var i=0;i<f.node.length;i++){
+					var option=document.createElement("option");
+					option.value=i;
+					option.innerHTML=f.node[i].name;
+					document.querySelector('#lb').appendChild(option);
+				}
+			}
+		</script>
+	</body>
+</html>
